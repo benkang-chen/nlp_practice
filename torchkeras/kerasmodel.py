@@ -19,14 +19,24 @@ class StepRunner:
         else:
             self.net.eval()
 
-    def __call__(self, batch):
+    def compute_loss(self, batch):
         features, labels = batch
 
         # loss
         with self.accelerator.autocast():
             preds = self.net(features)
             loss = self.loss_fn(preds, labels)
+        return loss, labels, preds
 
+    def __call__(self, batch):
+        # features, labels = batch
+        #
+        # # loss
+        # with self.accelerator.autocast():
+        #     preds = self.net(features)
+        #     loss = self.loss_fn(preds, labels)
+        start_time = datetime.datetime.now()
+        loss, labels, preds = self.compute_loss(batch)
         # backward()
         if self.stage == "train" and self.optimizer is not None:
             self.accelerator.backward(loss)
@@ -53,7 +63,9 @@ class StepRunner:
                 step_metrics['lr'] = self.optimizer.state_dict()['param_groups'][0]['lr']
             else:
                 step_metrics['lr'] = 0.0
-        return step_losses, step_metrics
+        end_time = datetime.datetime.now()
+        step_interval = end_time - start_time
+        return step_losses, step_metrics, step_interval
 
 
 class EpochRunner:
@@ -75,14 +87,17 @@ class EpochRunner:
         epoch_losses = {}
         for step, batch in loop:
             with self.accelerator.accumulate(self.net):
-                step_losses, step_metrics = self.steprunner(batch)
-                step_log = dict(step_losses, **step_metrics)
+                step_losses, step_metrics, step_interval = self.steprunner(batch)
+                time_info = {
+                    "s/batch": step_interval.total_seconds(),
+                    "remaining_time": str(step_interval * (n - step))[:-7]
+                }
+                step_log = dict(step_losses, **step_metrics, **time_info)
                 for k, v in step_losses.items():
                     epoch_losses[k] = epoch_losses.get(k, 0.0) + v
 
                 if step < n:
                     loop.set_postfix(**step_log)
-
                     if hasattr(self, 'progress') and self.accelerator.is_local_main_process:
                         post_log = dict(**{'i': step, 'n': n}, **step_log)
                         self.progress.set_postfix(**post_log)

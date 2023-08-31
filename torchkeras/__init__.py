@@ -1,5 +1,5 @@
 import sys
-from .kerasmodel import KerasModel
+from .kerasmodel import KerasModel, StepRunner
 from .summary import summary, flop_summary
 from .utils import seed_everything, printlog, colorful, delete_object
 #

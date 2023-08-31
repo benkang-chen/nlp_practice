@@ -5,10 +5,9 @@ from torch.optim import AdamW
 from transformers import get_linear_schedule_with_warmup
 from sklearn.metrics import hamming_loss, classification_report
 from tqdm import tqdm
-from model.TextRCNN_Bert import TextRCNN_Bert
-from torch.utils.tensorboard import SummaryWriter
+from text_classification.multil_label.model.TextRCNN_Bert import TextRCNN_Bert
 
-from text_classification.dataloader import get_dataloader
+from text_classification.multil_label.dataloader import get_dataloader
 
 
 # train
@@ -29,9 +28,9 @@ if __name__ == '__main__':
 
     save_dir = './saved_model'
     epochs = 5
-    bert_path = '../bert-base-chinese'
-    train_data_path = './data/multi-classification-train.txt'
-    dev_data_path = './data/multi-classification-test.txt'
+    bert_path = '../../bert-base-chinese'
+    train_data_path = 'data/multi-classification-train.txt'
+    dev_data_path = 'data/multi-classification-test.txt'
     batch_size = 64
     max_len = 256
     warmup_proportion = 0.1

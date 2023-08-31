@@ -1,10 +1,9 @@
 import torch
 from torch.optim import AdamW
 from transformers import get_linear_schedule_with_warmup
-from sklearn.metrics import hamming_loss, classification_report
 import torchkeras
-from model.TextRCNN_Bert import TextRCNN_Bert
-from text_classification.dataloader import get_dataloader
+from text_classification.multil_label.model.TextRCNN_Bert import TextRCNN_Bert
+from text_classification.multil_label.dataloader import get_dataloader
 
 
 class StepRunner:
@@ -73,9 +72,9 @@ def cal_loss(y_pred, y_true):
 if __name__ == '__main__':
     save_dir = './saved_model/model.pt'
     epochs = 5
-    bert_path = '../bert-base-chinese'
-    train_data_path = './data/multi-classification-train.txt'
-    dev_data_path = './data/multi-classification-test.txt'
+    bert_path = '../../bert-base-chinese'
+    train_data_path = 'data/multi-classification-train.txt'
+    dev_data_path = 'data/multi-classification-test.txt'
     batch_size = 6
     max_len = 256
     warmup_proportion = 0.1
@@ -106,7 +105,6 @@ if __name__ == '__main__':
     #     tokens_ids, mask, labels = batch['input_ids'], batch['attention_mask'], batch['labels']
     #     summary(model, input_data=[tokens_ids, mask])
     #     break
-    from torchkeras.kerascallbacks import TensorBoardCallback
 
     dfhistory = model.fit(train_data=train_dataloader,
                           val_data=dev_dataloader,

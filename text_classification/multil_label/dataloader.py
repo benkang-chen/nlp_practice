@@ -69,8 +69,8 @@ def get_dataloader(data_path, tokenizer_path, max_len, batch_size=6, task_type='
 
 
 if __name__ == '__main__':
-    data_loader = get_dataloader(data_path='./data/multi-classification-train.txt',
-                                 tokenizer_path='../bert-base-chinese',
+    data_loader = get_dataloader(data_path='data/multi-classification-train.txt',
+                                 tokenizer_path='../../bert-base-chinese',
                                  max_len=256)
     n = data_loader.size if hasattr(data_loader, 'size') else len(data_loader)
     print(n)
